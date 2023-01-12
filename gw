@@ -37,13 +37,15 @@ update() {
   LAST_UPDATE_IN_DAYS=$(((CURRENT_TIME - LAST_UPDATE) / 60 / 60 / 24))
   # Check if it's been more than a week since the last update
   if [ ${LAST_UPDATE_IN_DAYS} -gt 7 ]; then
-    debug "SCRIPT_UPDATE [start] on CURRENT_SCRIPT ${CURRENT_SCRIPT}"
+    debug "--------------------"
+    debug "SCRIPT_UPDATE [start] on CURRENT_SCRIPT ${CURRENT_SCRIPT} LAST_UPDATE_IN_DAYS [${LAST_UPDATE_IN_DAYS}]"
     TEMP_FILE=$(mktemp)
     debug "TEMP_FILE [${TEMP_FILE}]"
     if curl -s -o "${TEMP_FILE}" "${URL}"; then
       cat "${TEMP_FILE}" >"${CURRENT_SCRIPT}"
       echo "${CURRENT_TIME}" >"${LAST_UPDATE_FILE}"
       debug "SCRIPT_UPDATE [done] - restarting ${CURRENT_SCRIPT}"
+      debug "--------------------"
       GW_UPDATE="false" ${CURRENT_SCRIPT} "$@"
       exit 0
     else
@@ -52,6 +54,7 @@ update() {
     rm -rf "${TEMP_FILE}"
   else
     debug "SCRIPT_UPDATE [skipped] - LAST_UPDATE_IN_DAYS [${LAST_UPDATE_IN_DAYS}] is not greater than [7]"
+    debug "--------------------"
   fi
 }
 ########## FUNCTIONS END ##########
