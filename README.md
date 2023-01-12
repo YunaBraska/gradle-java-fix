@@ -16,7 +16,7 @@ Gradle wrapper which takes care of the required java version (wraps `gradlew`, `
 I always
 get the stupid
 error [Unsupported class file major version XX](https://mkyong.com/java/java-unsupported-class-file-major-version-61/)
-even when I define `sourceCompatibility` or `targetCompatibility` in my `build.gradle` file! That's cause gradle does
+even when I define `sourceCompatibility` or `targetCompatibility` or `JavaLanguageVersion.of` in my `build.gradle*` file! That's cause gradle does
 not take care of the java version. This script will change that now
 
 ### Usage
