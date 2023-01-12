@@ -7,7 +7,6 @@ IFS='|'
 DEBUG=$(echo "$@" | grep -qw -e "-d" -e "-w" -e "-s" -e "-S" && echo "true" || echo "false")
 HOME_DIR=$(eval echo ~)
 CURRENT_DIR=$(pwd)
-SCRIPT_FILE="${CURRENT_DIR}/$(basename "$0")"
 JAVA_ROOT_DIRS="${HOME_DIR}/.jdk|${HOME_DIR}/Library/Java/JavaVirtualMachines|/Library/Java/JavaVirtualMachines|/usr/lib/jvm|/usr/java|C:\Program Files\Java|C:\Program Files (x86)\Java"
 
 ########## FUNCTIONS START ##########
@@ -38,17 +37,17 @@ update() {
   LAST_UPDATE_IN_DAYS=$(((CURRENT_TIME - LAST_UPDATE) / 60 / 60 / 24))
   # Check if it's been more than a week since the last update
   if [ ${LAST_UPDATE_IN_DAYS} -gt 7 ]; then
-    debug "SCRIPT_UPDATE [start] on SCRIPT_FILE ${SCRIPT_FILE}"
+    debug "SCRIPT_UPDATE [start] on CURRENT_SCRIPT ${CURRENT_SCRIPT}"
     TEMP_FILE=$(mktemp)
     debug "TEMP_FILE [${TEMP_FILE}]"
     if curl -s -o "${TEMP_FILE}" "${URL}"; then
-      cat "${TEMP_FILE}" >"${SCRIPT_FILE}"
+      cat "${TEMP_FILE}" >"${CURRENT_SCRIPT}"
       echo "${CURRENT_TIME}" >"${LAST_UPDATE_FILE}"
-      debug "SCRIPT_UPDATE [done] - restarting ${SCRIPT_FILE}"
-      ${SCRIPT_FILE} "$@"
+      debug "SCRIPT_UPDATE [done] - restarting ${CURRENT_SCRIPT}"
+      ${CURRENT_SCRIPT} "$@"
       exit 0
     else
-      echo "[WARN] SCRIPT_UPDATE [failed] ad download [${URL}] on SCRIPT_FILE ${SCRIPT_FILE}. Use '-w' to see more information"
+      echo "[WARN] SCRIPT_UPDATE [failed] ad download [${URL}] on CURRENT_SCRIPT [${CURRENT_SCRIPT}]. Use '-w' to see more information"
     fi
     rm -rf "${TEMP_FILE}"
   else
