@@ -1,0 +1,163 @@
+#!/usr/bin/env sh
+# Another gradle wrapper...
+# TECHNOLOGY: POSIX Plain SH
+# CREATOR: Yuna Morgenstern (https://github.com/YunaBraska/gradle-java-fix)
+set -e
+IFS='|'
+DEBUG=$(echo "$@" | grep -qw -e "-d" -e "-w" -e "-s" -e "-S" && echo "true" || echo "false")
+HOME_DIR=$(eval echo ~)
+CURRENT_DIR=$(pwd)
+JAVA_ROOT_DIRS="${HOME_DIR}/.jdk|${HOME_DIR}/Library/Java/JavaVirtualMachines|/Library/Java/JavaVirtualMachines|/usr/lib/jvm|/usr/java|C:\Program Files\Java|C:\Program Files (x86)\Java"
+
+########## FUNCTIONS START ##########
+debug() {
+  if [ "${DEBUG}" = "true" ] && [ -n "${1}" ]; then
+    echo "[DEBUG] $(date +"%H:%M") ${1}"
+  fi
+}
+
+update() {
+  debug "Check for update"
+  URL="https://raw.githubusercontent.com/YunaBraska/gradle-java-fix/main/gw"
+  debug "URL [${URL}]"
+  CURRENT_SCRIPT="$(readlink -f "$0")"
+  debug "CURRENT_SCRIPT [${CURRENT_SCRIPT}]"
+  LAST_UPDATE_FILE="${CURRENT_DIR}/.gradle/last_update.gw"
+  debug "LAST_UPDATE_FILE [${LAST_UPDATE_FILE}]"
+  mkdir -p "$(dirname "${LAST_UPDATE_FILE}")"
+
+  if [ -e "${LAST_UPDATE_FILE}" ]; then
+    LAST_UPDATE=$(cat "${LAST_UPDATE_FILE}")
+  else
+    LAST_UPDATE=0
+  fi
+
+  debug "LAST_UPDATE [${LAST_UPDATE}]"
+  CURRENT_TIME=$(date +%s)
+  debug "CURRENT_TIME [${CURRENT_TIME}]"
+  LAST_UPDATE_IN_DAYS=$(((CURRENT_TIME - LAST_UPDATE) / 60 / 60 / 24))
+  # Check if it's been more than a week since the last update
+  if [ ${LAST_UPDATE_IN_DAYS} -gt 7 ]; then
+    TEMP_FILE=$(mktemp)
+    debug "TEMP_FILE [${TEMP_FILE}]"
+    if curl -o "${TEMP_FILE}" "${URL}"; then
+      cat "${TEMP_FILE}" >"${LOCAL_FILE}"
+      echo "${CURRENT_TIME}" >"${LAST_UPDATE_FILE}"
+    else
+      echo "[WARN] Failed to download the new version of the script. Use '-w' to see more information"
+      rm -rf "${TEMP_FILE}"
+    fi
+  else
+    debug "Update [skipped] cause LAST_UPDATE_IN_DAYS [${LAST_UPDATE_IN_DAYS}] is not greater than [7]"
+  fi
+}
+########## FUNCTIONS END ##########
+
+if [ "${GW_UPDATE}" = "true" ] || [ -z "${GW_UPDATE}" ]; then
+  update
+fi
+#Possible Java Paths
+debug "DEBUG [${DEBUG}]"
+debug "CURRENT_DIR [${CURRENT_DIR}]"
+debug "HOME_DIR [${HOME_DIR}]"
+debug "JAVA_HOME [${JAVA_HOME}]"
+debug "JAVA_ROOT_DIRS [${JAVA_ROOT_DIRS}]"
+
+JAVA_PATHS=""
+#FIND INSTALLED JAVA PATHS
+for dir in ${JAVA_ROOT_DIRS}; do
+  if [ -d "${dir}" ]; then
+    for sub_dir in "${dir}"/*/; do
+      if [ -d "${sub_dir}Contents/Home" ] || [ -d "${sub_dir}/Contents/Home" ]; then
+        JAVA_PATHS="$JAVA_PATHS|$sub_dir"
+        debug "FOUND JAVA_PATH [${sub_dir}]"
+      fi
+    done
+  else
+    debug "INVALID JAVA_PATH [${dir}]"
+  fi
+done
+### START VALIDATION [JAVA_PATHS]
+if [ -z "${JAVA_PATHS}" ]; then
+  echo "Could not find any installed JAVA_PATH in JAVA_ROOT_DIRS [${JAVA_ROOT_DIRS}]"
+  exit 2
+else
+  debug "JAVA_PATHS [$(echo "${JAVA_PATHS}" | grep -o '|' | wc -l | tr -d ' ')]"
+fi
+### EMD VALIDATION [JAVA_PATHS]
+
+# FIND GRADLE BUILD FILE
+GRADLE_FILE=$(find . -maxdepth 1 -name "build.gradle*" -type f -print | head -n 1)
+### START VALIDATION [GRADLE_FILE]
+if [ -z "${GRADLE_FILE}" ]; then
+  echo "Could not find a GRADLE_FILE in CURRENT_DIR [${CURRENT_DIR}]"
+  exit 2
+else
+  debug "GRADLE_FILE [${GRADLE_FILE}]"
+fi
+### EMD VALIDATION [GRADLE_FILE]
+
+# FIND JAVA VERSION IN BUILD FILE
+G_JAVA_VERSION=$(grep -E "sourceCompatibility|targetCompatibility" build.gradle | head -n1)
+# Trim gradle version
+if echo "${G_JAVA_VERSION}" | grep -q "_"; then
+  G_JAVA_VERSION=$(echo "${G_JAVA_VERSION}" | cut -d'_' -f2-)
+fi
+if echo "${G_JAVA_VERSION}" | grep -q "."; then
+  G_JAVA_VERSION=$(echo "${G_JAVA_VERSION}" | cut -d'.' -f2- | tr '_.' '..')
+fi
+### START VALIDATION [G_JAVA_VERSION]
+if [ -z "${G_JAVA_VERSION}" ]; then
+  echo "Could not find a G_JAVA_VERSION in GRADLE_FILE [${GRADLE_FILE}] is 'sourceCompatibility' or 'targetCompatibility' set?"
+  exit 2
+else
+  G_JAVA_VERSION_ALT="${G_JAVA_VERSION##*.}"
+  debug "G_JAVA_VERSION [${G_JAVA_VERSION}]"
+  debug "G_JAVA_VERSION_ALT [${G_JAVA_VERSION_ALT}]"
+fi
+### EMD VALIDATION [GRADLE_FILE]
+
+# Find gradle version in $JAVA_PATHS
+# TODO: Improvement: if not found e.g. -1.8. not found then try with -8.
+# TODO: Improvement: try to use the highest number
+# TODO: Improvement: try to use same distribution as $JAVA_HOME like graalvm, AdoptJDK, azul, coretto...
+for dir in $JAVA_PATHS; do
+  if echo "${dir}" | grep -q -e "-${G_JAVA_VERSION}." || echo "${dir}" | grep -q -e "-${G_JAVA_VERSION_ALT}."; then
+    if [ -d "${dir}Contents/Home" ]; then
+      JAVA_PATH="${dir}Contents/Home"
+    elif [ -d "${dir}/Contents/Home" ]; then
+      JAVA_PATH="${dir}/Contents/Home"
+    fi
+    break
+  fi
+done
+### VALIDATE
+if [ -z "${JAVA_PATH}" ]; then
+  echo "Could not find a JAVA_PATH for G_JAVA_VERSION [${G_JAVA_VERSION}]"
+  exit 2
+else
+  debug "JAVA_PATH [${JAVA_PATH}]"
+fi
+
+# GET GRADLE COMMAND
+if [ -e "${CURRENT_DIR}/gradlew" ] && [ ! "$(uname -s)" = "Windows" ]; then
+  CMD="${CURRENT_DIR}/gradlew"
+elif [ -e "${CURRENT_DIR}/gradlew.bat" ] && [ "$(uname -s)" = "Windows" ]; then
+  CMD="${CURRENT_DIR}/gradlew.bat"
+elif [ -e "${CURRENT_DIR}/gradle/gradlew" ] && [ ! "$(uname -s)" = "Windows" ]; then
+  CMD="${CURRENT_DIR}/gradle/gradlew"
+elif [ -e "${CURRENT_DIR}/gradle/gradlew.bat" ] && [ "$(uname -s)" = "Windows" ]; then
+  CMD="${CURRENT_DIR}/gradle/gradlew.bat"
+else
+  CMD=$(command -v gradle 2>/dev/null)
+  if [ -z "$CMD" ]; then
+    echo "Error: gradlew, gradlew.bat, or gradle not found"
+    exit 1
+  else
+    debug "CMD [${CMD}]"
+  fi
+fi
+
+# RUN GRADLE WITH NEW JAVA PATH && ALL ARGS
+debug "RUN [${CMD} $*] with JAVA_HOME [${JAVA_PATH}]"
+JAVA_HOME="${JAVA_PATH}" ${CMD} "$@"
