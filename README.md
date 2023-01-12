@@ -24,6 +24,9 @@ ls -1
 > gradlew
 > gradle.bat
 
+cat build.gradle | grep sourceCompatibility
+> sourceCompatibility = JavaVersion.VERSION_1_8
+
 echo $JAVA_HOME
 > /Library/Java/JavaVirtualMachines/graalvm-ce-java17-22.1.0/Contents/Home
 
