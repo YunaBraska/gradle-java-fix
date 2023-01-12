@@ -2,6 +2,15 @@
 
 Gradle wrapper which takes care of the required java version (wraps `gradlew`, `gradlew.bat`, `gradle` command)
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=HFHFUT3G6TZF6)
+
+[![Issues][issues_shield]][issues_link]
+[![Commit][commit_shield]][commit_link]
+[![License][license_shield]][license_link]
+[![Size][size_shield]][size_shield]
+![Label][technology]
+![Label][label_shield]
+
 ### Motivation
 
 I always
@@ -62,4 +71,41 @@ gw --version
 * Add this line `alias gw=~/gw` to your bash profile or .zshrc, ...
 
 
+[build_shield]: https://github.com/YunaBraska/gradle-java-fix/workflows/RELEASE/badge.svg
+
+[build_link]: https://github.com/YunaBraska/gradle-java-fix/actions?query=workflow%3AMVN_RELEASE
+
+[maintainable_shield]: https://img.shields.io/codeclimate/maintainability/YunaBraska/gradle-java-fix?style=flat-square
+
+[maintainable_link]: https://codeclimate.com/github/YunaBraska/gradle-java-fix/maintainability
+
+[coverage_shield]: https://img.shields.io/codeclimate/coverage/YunaBraska/gradle-java-fix?style=flat-square
+
+[coverage_link]: https://codeclimate.com/github/YunaBraska/gradle-java-fix/test_coverage
+
+[issues_shield]: https://img.shields.io/github/issues/YunaBraska/gradle-java-fix?style=flat-square
+
+[issues_link]: https://github.com/YunaBraska/gradle-java-fix/commits/main
+
+[commit_shield]: https://img.shields.io/github/last-commit/YunaBraska/gradle-java-fix?style=flat-square
+
+[commit_link]: https://github.com/YunaBraska/gradle-java-fix/issues
+
+[license_shield]: https://img.shields.io/github/license/YunaBraska/gradle-java-fix?style=flat-square
+
+[license_link]: https://github.com/YunaBraska/gradle-java-fix/blob/main/LICENSE
+
+[tag_shield]: https://img.shields.io/github/v/tag/YunaBraska/gradle-java-fix?style=flat-square
+
+[tag_link]: https://github.com/YunaBraska/gradle-java-fix/releases
+
+[size_shield]: https://img.shields.io/github/repo-size/YunaBraska/gradle-java-fix?style=flat-square
+
+[label_shield]: https://img.shields.io/badge/Yuna-QueenInside-blueviolet?style=flat-square
+
+[gitter_shield]: https://img.shields.io/gitter/room/YunaBraska/gradle-java-fix?style=flat-square
+
+[gitter_link]: https://gitter.im/gradle-java-fix/Lobby
+
+[technology]: https://img.shields.io/badge/sh-POSIX-blueviolet?style=flat-square
 
