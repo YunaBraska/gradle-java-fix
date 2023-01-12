@@ -5,17 +5,21 @@ Gradle wrapper which takes care of the required java version (wraps `gradlew`, `
 ### Motivation
 
 I always
-get [Unsupported class file major version XX](https://mkyong.com/java/java-unsupported-class-file-major-version-61/)
-even when I define `sourceCompatibility` or `targetCompatibility` in my `build.gradle` file!
+get the stupid
+error [Unsupported class file major version XX](https://mkyong.com/java/java-unsupported-class-file-major-version-61/)
+even when I define `sourceCompatibility` or `targetCompatibility` in my `build.gradle` file! That's cause gradle does
+not take care of the java version. This script will change that now
 
 ### Usage
 
 * Place the `gw` sh script next to you `gradlew` file and use it like you would with `gradlew` e.g. `gw --version`
 
 ### Example
+
 ```shell
 cd my_repo
 ls -1
+> gw
 > build.gradle
 > gradlew
 > gradle.bat
@@ -40,8 +44,10 @@ gw --version
 ### Current limitations
 
 * The script is NOT tested on `windows` or `cygwin`
-* Can't u `sourceCompatibility` or `targetCompatibility` is needed
-* It's not installing any java versions for you (Use your IDE to download the right java version)
+* `sourceCompatibility` or `targetCompatibility` is needed in `build.gradle*` but the script cant resolve variables
+    * workaround: call the version variable like the java version e.g. `sourceCompatibility = JavaVersion.VERSION_1_8`
+* It's not installing any java versions for you
+    * Use your IDE to download the right java version
 
 ### Install to a repository
 
