@@ -19,9 +19,14 @@ error [Unsupported class file major version XX](https://mkyong.com/java/java-uns
 even when I define `sourceCompatibility` or `targetCompatibility` or `JavaLanguageVersion.of` in my `build.gradle*` file! That's cause gradle does
 not take care of the java version. This script will change that now
 
-### Usage
+### Install to a repository
 
-* Place the `gw` sh script next to you `gradlew` file and use it like you would with `gradlew` e.g. `gw --version`
+* Download the and add `gw` sh script to your repository (next to your `gradlew`)
+
+### Install as global command / alias
+
+* Download the `gw` sh script to your home folder (`~`)
+* Add this line `alias gw=~/gw` to your bash profile or .zshrc, ...
 
 ### Example
 
@@ -60,15 +65,6 @@ gw --version
     * workaround: call the version variable like the java version e.g. `sourceCompatibility = JavaVersion.VERSION_1_8`
 * It's not installing any java versions for you
     * Use your IDE to download the right java version
-
-### Install to a repository
-
-* Download the and add `gw` sh script to your repository (next to your `gradlew`)
-
-### Install as global command / alias
-
-* Download the `gw` sh script to your home folder (`~`)
-* Add this line `alias gw=~/gw` to your bash profile or .zshrc, ...
 
 
 [build_shield]: https://github.com/YunaBraska/gradle-java-fix/workflows/RELEASE/badge.svg
